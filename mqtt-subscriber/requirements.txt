@@ -1,0 +1,5 @@
+paho-mqtt
+pillow
+python-dotenv
+numpy
+supabase
