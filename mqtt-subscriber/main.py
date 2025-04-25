@@ -2,6 +2,7 @@ import json
 import binascii
 import numpy as np
 from PIL import Image
+import os
 from collections import defaultdict
 from datetime import datetime
 from paho.mqtt.client import Client
@@ -37,6 +38,7 @@ def on_message(client, userdata, msg):
         
             
         if len(image_chunks[timestamp]) == total_chunks:
+            receive_time = datetime.now().isoformat()
             missing = [i for i in range(total_chunks) if i not in image_chunks[timestamp]]
             if missing:
                 print(f"[WARN] Missing chunks: {missing}")
@@ -46,7 +48,7 @@ def on_message(client, userdata, msg):
         
                 filename = f"{timestamp}.png"
                 with open(filename, "rb") as f:
-                    response = supabase.storage.from_(SUPABASE_BUCKET).upload(
+                    supabase.storage.from_(SUPABASE_BUCKET).upload(
                         file = f,
                         path = filename,
                         file_options={"content_type": "image/png"}
@@ -55,14 +57,15 @@ def on_message(client, userdata, msg):
                 
                 supabase.table("image_metadata").insert({
                     "timestamp": timestamp,
-                    "chunk_id": chunk_id,
                     "total_chunks": total_chunks,
                     "file_path": filename,
+                    "receive_time": receive_time,
                     "created_at": datetime.now().isoformat()
                 }).execute()
                 print("[SUPABASE] Metadata saved.")
 
                 del image_chunks[timestamp]
+                os.remove(filename)
                 
     except Exception as e:
         print("[ERROR]", e)
