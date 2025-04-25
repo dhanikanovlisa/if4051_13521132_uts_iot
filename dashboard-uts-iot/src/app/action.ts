@@ -13,7 +13,7 @@ export type ImageMetadata = {
 }
 
 export type DataChart = {
-    image: string,
+    timestamp: string,
     latency: number,
 }
 
