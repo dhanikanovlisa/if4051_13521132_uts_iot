@@ -29,6 +29,7 @@ def on_message(client, userdata, msg):
     try:
         payload = json.loads(msg.payload.decode())
         timestamp = payload['timestamp']
+        send_at = datetime.fromtimestamp(timestamp)
         chunk_id = payload['chunk_id']
         total_chunks = payload['total_chunks']
         data = payload['data']
@@ -38,8 +39,9 @@ def on_message(client, userdata, msg):
         
             
         if len(image_chunks[timestamp]) == total_chunks:
-            receive_time = datetime.now().isoformat()
+            received_at = datetime.now()
             missing = [i for i in range(total_chunks) if i not in image_chunks[timestamp]]
+            latency = (received_at - send_at).total_seconds()
             if missing:
                 print(f"[WARN] Missing chunks: {missing}")
             else:
@@ -56,10 +58,11 @@ def on_message(client, userdata, msg):
                     print("[SUPABASE] Image uploaded to Supabase Storage.") 
                 
                 supabase.table("image_metadata").insert({
-                    "timestamp": timestamp,
+                    "send_at": send_at.isoformat(),
                     "total_chunks": total_chunks,
+                    "latency": latency,
                     "file_path": filename,
-                    "receive_time": receive_time,
+                    "received_at": received_at.isoformat(),
                     "created_at": datetime.now().isoformat()
                 }).execute()
                 print("[SUPABASE] Metadata saved.")

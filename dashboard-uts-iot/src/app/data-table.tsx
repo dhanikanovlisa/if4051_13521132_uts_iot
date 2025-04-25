@@ -52,7 +52,7 @@ export function DataTable({ data }: { data: ImageMetadata[] }) {
   const columns: ColumnDef<ImageMetadata>[] = useMemo(
     () => [
       {
-        accessorKey: "timestamp",
+        accessorKey: "send_at",
         header: ({ column }) => {
           return (
             <div
@@ -67,7 +67,12 @@ export function DataTable({ data }: { data: ImageMetadata[] }) {
                 }
               }}
             >
-              <span>Received at</span>
+              <div className="flex flex-col">
+                <span>Send At</span>
+                <span className="text-[10px] font-light text-muted-foreground">
+                  Waktu ketika chunk pertama dikirim
+                </span>
+              </div>
               {column.getIsSorted() === "asc" ? (
                 <ArrowUp size={16} className="text-muted-foreground" />
               ) : column.getIsSorted() === "desc" ? (
@@ -79,13 +84,88 @@ export function DataTable({ data }: { data: ImageMetadata[] }) {
           );
         },
         cell: ({ row }) => {
-          const timestamp = row.getValue("timestamp") as number;
-          const date = dayjs.unix(timestamp).format("YYYY-MM-DD HH:mm:ss");
-          return <div>{date}</div>;
+          const sendTime = row.getValue("send_at") as string;
+          return <div>{dayjs(sendTime).format("YYYY-MM-DD HH:mm:ss")}</div>;
         },
 
         enableSorting: true,
         enableMultiSort: true,
+      },
+      {
+        accessorKey: "received_at",
+        header: ({ column }) => {
+          return (
+            <div
+              className="flex cursor-pointer items-center justify-between space-x-2"
+              onClick={() => {
+                if (column.getIsSorted() === "asc") {
+                  column.toggleSorting();
+                } else if (column.getIsSorted() === "desc") {
+                  column.clearSorting();
+                } else {
+                  column.toggleSorting();
+                }
+              }}
+            >
+              <div className="flex flex-col">
+                <span>Received At</span>
+                <span className="text-[10px] font-light text-muted-foreground">
+                  Waktu chunk terakhir diterima
+                </span>
+              </div>
+              {column.getIsSorted() === "asc" ? (
+                <ArrowUp size={16} className="text-muted-foreground" />
+              ) : column.getIsSorted() === "desc" ? (
+                <ArrowDown size={16} className="text-muted-foreground" />
+              ) : (
+                <ArrowDownUp size={16} className="text-muted-foreground" />
+              )}
+            </div>
+          );
+        },
+        cell: ({ row }) => {
+          const receiveTime = row.getValue("received_at") as string;
+          return <div>{dayjs(receiveTime).format("YYYY-MM-DD HH:mm:ss")}</div>;
+        },
+        enableSorting: true,
+      },
+      {
+        accessorKey: "latency",
+        header: ({ column }) => {
+          return (
+            <div
+              className="flex cursor-pointer items-center justify-between space-x-2"
+              onClick={() => {
+                if (column.getIsSorted() === "asc") {
+                  column.toggleSorting();
+                } else if (column.getIsSorted() === "desc") {
+                  column.clearSorting();
+                } else {
+                  column.toggleSorting();
+                }
+              }}
+            >
+              <div className="flex flex-col">
+                <span>Latency</span>
+                <span className="text-[10px] font-light text-muted-foreground">
+                  
+                </span>
+              </div>
+              {column.getIsSorted() === "asc" ? (
+                <ArrowUp size={16} className="text-muted-foreground" />
+              ) : column.getIsSorted() === "desc" ? (
+                <ArrowDown size={16} className="text-muted-foreground" />
+              ) : (
+                <ArrowDownUp size={16} className="text-muted-foreground" />
+              )}
+            </div>
+          );
+        },
+        cell: ({ row }) => {
+          const latency = row.getValue("latency") as number;
+          return <div>{latency.toFixed(3)}</div>;
+        },
+        enableSorting: true,
       },
       {
         accessorKey: "created_at",
@@ -103,7 +183,12 @@ export function DataTable({ data }: { data: ImageMetadata[] }) {
                 }
               }}
             >
-              <span>Created At</span>
+              <div className="flex flex-col">
+                <span>Created At</span>
+                <span className="text-[10px] font-light text-muted-foreground">
+                  Waktu data dimasukkan ke dalam db
+                </span>
+              </div>
               {column.getIsSorted() === "asc" ? (
                 <ArrowUp size={16} className="text-muted-foreground" />
               ) : column.getIsSorted() === "desc" ? (
@@ -300,7 +385,7 @@ export function DataTable({ data }: { data: ImageMetadata[] }) {
       <Dialog open={openImage !== null} onOpenChange={() => setOpenImage(null)}>
         <DialogContent className="max-w-[90vw]">
           <DialogHeader>
-            <DialogTitle className="break-all">{openImage}</DialogTitle>
+            <DialogTitle className="break-all">Preview Image</DialogTitle>
           </DialogHeader>
           <div className="flex justify-center items-center max-h-[80vh] overflow-auto">
             {openImage && (

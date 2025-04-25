@@ -4,11 +4,19 @@ export type ImageMetadata = {
     id: string,
     created_at: string,
     timestamp: number,
-    chunk_id: number,
+    receive_at: string,
+    send_at: string,
     total_chunks: number,
     file_path: string
     public_url: string
+    latency: number,
 }
+
+export type DataChart = {
+    image: string,
+    latency: number,
+}
+
 
 export async function getData() {
     const supabase = await createClient();
@@ -24,7 +32,7 @@ export async function getData() {
         image_metadata.map(async (image: ImageMetadata) => {
             const { data: imageFromBucket } = await supabase.storage.from("if4051-uts-iot-bucket").getPublicUrl(image.file_path, {
                 download: false,
-            }); 
+            });
 
             return {
                 ...image,
@@ -33,6 +41,16 @@ export async function getData() {
         })
     )
 
-    return dataImage;
+    const latencies = dataImage.map((data) => (data.latency));
+    const avgLatencies = latencies.reduce((acc: number, cur: number) => acc + cur, 0) / latencies.length;
 
+    const maxLatency = Math.max(...latencies);
+    const minLatency = Math.min(...latencies);
+
+    return {
+        avgLatencies,
+        maxLatency,
+        minLatency,
+        dataImage
+    };
 }
