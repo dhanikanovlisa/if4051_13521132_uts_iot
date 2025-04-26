@@ -48,11 +48,13 @@ def on_message(client, userdata, msg):
                 print(f"[INFO] All chunks received for image {timestamp}. Decoding...")
                 decode_image(image_chunks[timestamp], total_chunks, timestamp)
         
-                filename = f"{timestamp}.png"
-                with open(filename, "rb") as f:
+                file_name = f"{timestamp}.png"
+                file_size = os.path.getsize(file_name)
+                file_size_kb = file_size / 1024
+                with open(file_name, "rb") as f:
                     supabase.storage.from_(SUPABASE_BUCKET).upload(
                         file = f,
-                        path = filename,
+                        path = file_name,
                         file_options={"content_type": "image/png"}
                     )
                     print("[SUPABASE] Image uploaded to Supabase Storage.") 
@@ -61,14 +63,15 @@ def on_message(client, userdata, msg):
                     "send_at": send_at.isoformat(),
                     "total_chunks": total_chunks,
                     "latency": latency,
-                    "file_path": filename,
+                    "file_path": file_name,
+                    "file_size": file_size_kb,
                     "received_at": received_at.isoformat(),
                     "created_at": datetime.now().isoformat()
                 }).execute()
                 print("[SUPABASE] Metadata saved.")
 
                 del image_chunks[timestamp]
-                os.remove(filename)
+                os.remove(file_name)
                 
     except Exception as e:
         print("[ERROR]", e)

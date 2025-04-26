@@ -7,7 +7,10 @@ export type ImageMetadata = {
     receive_at: string,
     send_at: string,
     total_chunks: number,
-    file_path: string
+    file_path: string,
+    file_size: number,
+    avg_chunk_size: number,
+    transmission_efficiency: number,
     public_url: string
     latency: number,
 }
@@ -17,6 +20,7 @@ export type DataChart = {
     latency: number,
 }
 
+const CHUNK_SIZE = 8192;
 
 export async function getData() {
     const supabase = await createClient();
@@ -33,9 +37,13 @@ export async function getData() {
             const { data: imageFromBucket } = await supabase.storage.from("if4051-uts-iot-bucket").getPublicUrl(image.file_path, {
                 download: false,
             });
+            const avg_chunk_size = image.file_size / image.total_chunks;
+            const transmission_efficiency = (avg_chunk_size * 1024 / CHUNK_SIZE) * 100;
 
             return {
                 ...image,
+                avg_chunk_size: avg_chunk_size,
+                transmission_efficiency: transmission_efficiency,
                 public_url: imageFromBucket?.publicUrl || "",
             }
         })
@@ -46,6 +54,7 @@ export async function getData() {
 
     const maxLatency = Math.max(...latencies);
     const minLatency = Math.min(...latencies);
+
 
     return {
         avgLatencies,

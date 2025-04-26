@@ -147,9 +147,7 @@ export function DataTable({ data }: { data: ImageMetadata[] }) {
             >
               <div className="flex flex-col">
                 <span>Latency</span>
-                <span className="text-[10px] font-light text-muted-foreground">
-                  
-                </span>
+                <span className="text-[10px] font-light text-muted-foreground"></span>
               </div>
               {column.getIsSorted() === "asc" ? (
                 <ArrowUp size={16} className="text-muted-foreground" />
@@ -164,6 +162,82 @@ export function DataTable({ data }: { data: ImageMetadata[] }) {
         cell: ({ row }) => {
           const latency = row.getValue("latency") as number;
           return <div>{latency.toFixed(3)}</div>;
+        },
+        enableSorting: true,
+      },
+      {
+        accessorKey: "avg_chunk_size",
+        header: ({ column }) => {
+          return (
+            <div
+              className="flex cursor-pointer items-center justify-between space-x-2"
+              onClick={() => {
+                if (column.getIsSorted() === "asc") {
+                  column.toggleSorting();
+                } else if (column.getIsSorted() === "desc") {
+                  column.clearSorting();
+                } else {
+                  column.toggleSorting();
+                }
+              }}
+            >
+              <div className="flex flex-col">
+                <span>Average Chunk Size</span>
+                <span className="text-[10px] font-light text-muted-foreground"></span>
+              </div>
+              {column.getIsSorted() === "asc" ? (
+                <ArrowUp size={16} className="text-muted-foreground" />
+              ) : column.getIsSorted() === "desc" ? (
+                <ArrowDown size={16} className="text-muted-foreground" />
+              ) : (
+                <ArrowDownUp size={16} className="text-muted-foreground" />
+              )}
+            </div>
+          );
+        },
+        cell: ({ row }) => {
+          const avgChunkSize = row.getValue("avg_chunk_size") as number;
+          return <div>{avgChunkSize.toFixed(3)}</div>;
+        },
+        enableSorting: true,
+      },
+      {
+        accessorKey: "transmission_efficiency",
+        header: ({ column }) => {
+          return (
+            <div
+              className="flex cursor-pointer items-center justify-between space-x-2"
+              onClick={() => {
+                if (column.getIsSorted() === "asc") {
+                  column.toggleSorting();
+                } else if (column.getIsSorted() === "desc") {
+                  column.clearSorting();
+                } else {
+                  column.toggleSorting();
+                }
+              }}
+            >
+              <div className="flex flex-col">
+                <span>Transmission Efficiency</span>
+                <span className="text-[10px] font-light text-muted-foreground">
+                  CHUNK_SIZE = 8192, MAX: 20480
+                </span>
+              </div>
+              {column.getIsSorted() === "asc" ? (
+                <ArrowUp size={16} className="text-muted-foreground" />
+              ) : column.getIsSorted() === "desc" ? (
+                <ArrowDown size={16} className="text-muted-foreground" />
+              ) : (
+                <ArrowDownUp size={16} className="text-muted-foreground" />
+              )}
+            </div>
+          );
+        },
+        cell: ({ row }) => {
+          const transmissionEfficiency = row.getValue(
+            "transmission_efficiency"
+          ) as number;
+          return <div>{transmissionEfficiency.toFixed(3)}</div>;
         },
         enableSorting: true,
       },
