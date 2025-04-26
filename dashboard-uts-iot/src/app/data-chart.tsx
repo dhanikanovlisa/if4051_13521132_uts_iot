@@ -36,7 +36,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function DataChartComponent({ data }: { data: DataChart[] }) {
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date>(new Date(2025, 3, 26));
   const [baseData] = useState<DataChart[]>(data);
   const [filteredData, setFilteredData] = useState<DataChart[]>(data);
 
