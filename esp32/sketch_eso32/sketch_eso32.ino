@@ -72,14 +72,14 @@ int getT() {
 }
 
 void sendFakeImageInChunks() {
-  Serial.println("➡️ Entering sendFakeImageInChunks()");
+  Serial.println("[INFO] Entering sendFakeImageInChunks()");
   //Get Time
   long timestamp = getTimestamp();
   int totalBytes = IMG_WIDTH * IMG_HEIGHT;
   int numChunks = (totalBytes + CHUNK_SIZE - 1) / CHUNK_SIZE;
 
   for (int chunkID = 0; chunkID < numChunks; chunkID++) {
-    Serial.printf("  🔄 Starting to send chunk %d/%d (Free Heap: %d)\n", chunkID + 1, numChunks, ESP.getFreeHeap());
+    Serial.printf("  [INFO] Starting to send chunk %d/%d (Free Heap: %d)\n", chunkID + 1, numChunks, ESP.getFreeHeap());
     client.loop();
 
     int bytesToSend = min(CHUNK_SIZE, totalBytes - chunkID * CHUNK_SIZE);
@@ -89,7 +89,7 @@ void sendFakeImageInChunks() {
     char *payload = new char[maxPayloadSize + 1];  // Allocate dynamically
 
     if (payload == nullptr) {
-      Serial.println("❌ Failed to allocate payload buffer!");
+      Serial.println("[ERROR] Failed to allocate payload buffer!");
       continue;  // Skip this chunk
     }
 
@@ -103,7 +103,7 @@ void sendFakeImageInChunks() {
       if (index < totalBytes) {
         len += sprintf(payload + len, "%02X", image_data[index]);
       } else {
-        Serial.println("⚠️ Payload buffer full!");
+        Serial.println("[WARNING] Payload buffer full!");
         break;
       }
     }
@@ -111,15 +111,15 @@ void sendFakeImageInChunks() {
     strcat(payload, "\"}");
 
     if (client.publish(publish_topic, payload)) {
-      Serial.printf("    ✅ Sent chunk %d/%d (%d bytes)\n", chunkID + 1, numChunks, bytesToSend);
+      Serial.printf("    [INFO] Sent chunk %d/%d (%d bytes)\n", chunkID + 1, numChunks, bytesToSend);
     } else {
-      Serial.printf("    ❌ Failed to send chunk %d/%d\n", chunkID + 1, numChunks);
+      Serial.printf("    [ERROR] Failed to send chunk %d/%d\n", chunkID + 1, numChunks);
     }
 
     delete[] payload;  // Free the dynamically allocated memory
     delay(100);        // Increased delay
   }
-  Serial.println("⬅️ Exiting sendFakeImageInChunks()");
+  Serial.println("Exiting sendFakeImageInChunks()");
 }
 
 void setup() {
@@ -145,12 +145,12 @@ void loop() {
   int T = getT();
 
   for (int i = 0; i < K; i++) {
-    Serial.printf("🖼 Sending image %d of %d\n", i + 1, K);
+    Serial.printf("[INF0] Sending image %d of %d\n", i + 1, K);
     sendFakeImageInChunks();
     delay(T * 1000);
   }
 
-  Serial.println("✅ All images sent");
+  Serial.println("[INFO] All images sent");
   while (1)
     ;
 }
