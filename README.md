@@ -3,7 +3,7 @@
 ![Arsitektur End-to-End](laporan/Arsitektur%20End-to-End.png)
 
 ## Deskripsi
-Repository ini adalah implementasi dari UTS IF4051 Pengembangan Sistem IoT. Dashboard aplikasi dapat diakses melalui [link ini](https://uts-iot-13521132.vercel.app/).
+Repository ini adalah implementasi dari UTS IF4051 Pengembangan Sistem IoT. Dashboard aplikasi dapat diakses melalui [link ini](https://if4051-13521132-uts-iot.vercel.app/).
 
 
 ## Instalasi
